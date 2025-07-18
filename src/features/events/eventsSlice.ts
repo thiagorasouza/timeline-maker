@@ -15,14 +15,14 @@ const initialState: EventsState = [
     title: "Lançamento da Nova Linha de Produtos 'Aurora'",
     description:
       "Apresentação oficial da coleção 'Aurora', focada em sustentabilidade e design inovador.",
-    date: "2025-08-15T10:00:00Z",
+    date: "2025-08-15",
   },
   {
     id: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     title: "Reunião Semanal de Planejamento de Sprint",
     description:
       "Discussão do progresso do sprint atual, planejamento das próximas tarefas e revisão de impedimentos.",
-    date: "2025-07-22T14:30:00Z",
+    date: "2025-07-22",
   },
 ]
 

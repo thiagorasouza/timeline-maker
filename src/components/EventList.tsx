@@ -1,11 +1,17 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import { remove } from "../features/events/eventsSlice"
 
-export function EventList({ className }: { className?: string }) {
+export function EventList({
+  className,
+  onUpdateClick,
+}: {
+  className?: string
+  onUpdateClick: (id: string) => void
+}) {
   const events = useAppSelector(state => state.events)
   const dispatch = useAppDispatch()
 
-  async function handleDelete(id: string) {
+  async function handleRemove(id: string) {
     dispatch(remove(id))
   }
 
@@ -42,13 +48,20 @@ export function EventList({ className }: { className?: string }) {
               <td className="p-2 border">
                 {new Date(event.date).toLocaleDateString("pt-BR")}
               </td>
-              <td className="p-2 border">
+              <td className="p-2 border space-y-2">
                 <button
                   type="button"
                   className="px-2 py-1 bg-red-700 text-white"
-                  onClick={() => handleDelete(event.id)}
+                  onClick={() => handleRemove(event.id)}
                 >
-                  Delete
+                  Remove
+                </button>
+                <button
+                  type="button"
+                  className="px-2 py-1"
+                  onClick={() => onUpdateClick(event.id)}
+                >
+                  Update
                 </button>
               </td>
             </tr>
