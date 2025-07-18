@@ -2,20 +2,28 @@ import { faker } from "@faker-js/faker"
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { useAppDispatch, useAppSelector } from "../app/hooks"
-import { add, Event, update } from "../features/events/eventsSlice"
+import {
+  addEvent,
+  Event,
+  selectEventById,
+  updateEvent,
+} from "../features/events/eventsSlice"
+import { getPresenteDateString } from "../utils/helpers"
 
 export function EventForm({
   className,
   eventId,
+  onCancelClick,
 }: {
   className?: string
-  eventId?: string | null
+  eventId?: string
+  onCancelClick: () => void
 }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(getPresenteDateString)
   const dispatch = useAppDispatch()
-  const events = useAppSelector(state => state.events)
+  const event = useAppSelector(state => selectEventById(state, eventId))
 
   async function handleSubmit(formData: FormData) {
     if (eventId) {
@@ -24,14 +32,14 @@ export function EventForm({
         ...Object.fromEntries(formData.entries()),
       } as unknown as Event
 
-      dispatch(update(eventData))
+      dispatch(updateEvent(eventData))
     } else {
       const eventData = {
         id: uuidv4(),
         ...Object.fromEntries(formData.entries()),
       } as unknown as Event
 
-      dispatch(add(eventData))
+      dispatch(addEvent(eventData))
     }
   }
 
@@ -42,15 +50,16 @@ export function EventForm({
   }
 
   useEffect(() => {
-    if (eventId) {
-      const event = events.find(event => event.id === eventId)
-      if (event) {
-        setTitle(event.title)
-        setDescription(event.description)
-        setDate(event.date)
-      }
+    if (event) {
+      setTitle(event.title)
+      setDescription(event.description)
+      setDate(event.date)
+    } else {
+      setTitle("")
+      setDescription("")
+      setDate(getPresenteDateString())
     }
-  }, [eventId, events])
+  }, [event])
 
   return (
     <form
@@ -91,13 +100,23 @@ export function EventForm({
         <button type="submit">{eventId ? "Update" : "Add"}</button>
       </div>
       <div>
-        <button
-          type="button"
-          className="bg-white! text-black! border"
-          onClick={() => handleAutofill()}
-        >
-          Auto-fill
-        </button>
+        {eventId ? (
+          <button
+            type="button"
+            className="bg-white! text-black! border"
+            onClick={() => onCancelClick()}
+          >
+            Cancel
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="bg-white! text-black! border"
+            onClick={() => handleAutofill()}
+          >
+            Auto-fill
+          </button>
+        )}
       </div>
     </form>
   )

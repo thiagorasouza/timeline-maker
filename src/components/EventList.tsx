@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks"
-import { remove } from "../features/events/eventsSlice"
+import { removeEvent, selectAllEvents } from "../features/events/eventsSlice"
+import { DateFilter } from "./DateFilter"
 
 export function EventList({
   className,
@@ -8,17 +9,16 @@ export function EventList({
   className?: string
   onUpdateClick: (id: string) => void
 }) {
-  const events = useAppSelector(state => state.events)
+  const events = useAppSelector(selectAllEvents)
   const dispatch = useAppDispatch()
 
   async function handleRemove(id: string) {
-    dispatch(remove(id))
+    dispatch(removeEvent(id))
   }
 
   if (events.length === 0) {
     return (
       <div className={`${className}`}>
-        <h2 className="font-semibold mb-4">Events</h2>
         <p>No events yet.</p>
       </div>
     )
@@ -26,7 +26,7 @@ export function EventList({
 
   return (
     <div className={`${className}`}>
-      <h2 className="font-semibold mb-2">Events</h2>
+      <DateFilter className="mb-4" />
       <table className="table-auto">
         <thead>
           <tr>
