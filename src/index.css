@@ -1,13 +1,18 @@
-body {
-  margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import "tailwindcss";
+
+label {
+  @apply block font-medium mb-2;
 }
 
-code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+input,
+textarea {
+  @apply p-2 border w-full;
+}
+
+textarea {
+  @apply min-h-[200px];
+}
+
+button {
+  @apply p-3 bg-black text-white font-semibold text-center w-full cursor-pointer;
 }
