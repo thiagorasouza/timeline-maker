@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
-label {
-  @apply block font-medium mb-2;
-}
+@layer base {
+  label {
+    @apply block font-medium mb-2;
+  }
 
-input,
-textarea {
-  @apply p-2 border w-full;
-}
+  input,
+  textarea {
+    @apply p-2 border w-full;
+  }
 
-textarea {
-  @apply min-h-[200px];
-}
+  textarea {
+    @apply min-h-[200px];
+  }
 
-button {
-  @apply p-3 bg-black text-white font-semibold text-center w-full cursor-pointer;
+  button {
+    @apply p-3 bg-black text-white font-semibold text-center w-full cursor-pointer;
+  }
 }
