@@ -67,6 +67,19 @@ export const { addEvent, removeEvent, updateEvent, setDateFilter } =
   eventsSlice.actions
 
 export const selectAllEvents = (state: RootState) => state.events.events
+export const selectFilteredSortedEvents = (state: RootState) => {
+  const start = new Date(state.events.dateFilter.start)
+  const end = new Date(state.events.dateFilter.end)
+  return state.events.events
+    .filter(event => {
+      const date = new Date(event.date)
+      return date >= start && date <= end
+    })
+    .sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
+}
+
 export const selectEventById = (state: RootState, id?: string) =>
   id ? state.events.events.find(event => event.id === id) : undefined
 export const selectDateFilter = (state: RootState) => state.events.dateFilter

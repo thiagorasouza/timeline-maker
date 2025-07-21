@@ -1,5 +1,8 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks"
-import { removeEvent, selectAllEvents } from "../features/events/eventsSlice"
+import {
+  removeEvent,
+  selectFilteredSortedEvents,
+} from "../features/events/eventsSlice"
 import { DateFilter } from "./DateFilter"
 
 export function EventList({
@@ -9,7 +12,7 @@ export function EventList({
   className?: string
   onUpdateClick: (id: string) => void
 }) {
-  const events = useAppSelector(selectAllEvents)
+  const events = useAppSelector(selectFilteredSortedEvents)
   const dispatch = useAppDispatch()
 
   async function handleRemove(id: string) {
@@ -19,6 +22,7 @@ export function EventList({
   if (events.length === 0) {
     return (
       <div className={`${className}`}>
+        <DateFilter className="mb-4" />
         <p>No events yet.</p>
       </div>
     )
@@ -46,7 +50,9 @@ export function EventList({
             <tr key={event.id}>
               <td className="p-2 border">{event.title}</td>
               <td className="p-2 border">
-                {new Date(event.date).toLocaleDateString("pt-BR")}
+                {new Date(event.date).toLocaleDateString("pt-BR", {
+                  timeZone: "UTC",
+                })}
               </td>
               <td className="p-2 border space-y-2">
                 <button
