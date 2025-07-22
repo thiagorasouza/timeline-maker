@@ -11,3 +11,9 @@ export function getFutureDateString(days: number) {
 export function getPresenteDateString() {
   return new Date().toISOString().slice(0, 10)
 }
+
+export function formatDateForDisplay(date: string) {
+  return new Date(date).toLocaleDateString("pt-BR", {
+    timeZone: "UTC",
+  })
+}

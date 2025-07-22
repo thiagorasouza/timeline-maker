@@ -3,6 +3,7 @@ import {
   removeEvent,
   selectFilteredSortedEvents,
 } from "../features/events/eventsSlice"
+import { formatDateForDisplay } from "../utils/helpers"
 import { DateFilter } from "./DateFilter"
 
 export function EventList({
@@ -49,11 +50,7 @@ export function EventList({
           {events.map(event => (
             <tr key={event.id}>
               <td className="p-2 border">{event.title}</td>
-              <td className="p-2 border">
-                {new Date(event.date).toLocaleDateString("pt-BR", {
-                  timeZone: "UTC",
-                })}
-              </td>
+              <td className="p-2 border">{formatDateForDisplay(event.date)}</td>
               <td className="p-2 border space-y-2">
                 <button
                   type="button"
