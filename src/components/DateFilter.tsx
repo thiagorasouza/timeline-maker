@@ -1,6 +1,10 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../app/hooks"
-import { selectDateFilter, setDateFilter } from "../features/events/eventsSlice"
+import {
+  clearDateFilter,
+  selectDateFilter,
+  setDateFilter,
+} from "../features/events/eventsSlice"
 
 export function DateFilter({ className }: { className?: string }) {
   const dateFilter = useAppSelector(selectDateFilter)
@@ -8,10 +12,18 @@ export function DateFilter({ className }: { className?: string }) {
   const [start, setStart] = useState(dateFilter.start)
   const [end, setEnd] = useState(dateFilter.end)
 
-  function handleFilter() {
-    console.log("Date filter", { start, end })
+  function handleApplyFilter() {
     dispatch(setDateFilter({ start, end }))
   }
+
+  function handleClear() {
+    dispatch(clearDateFilter())
+  }
+
+  useEffect(() => {
+    setStart(dateFilter.start)
+    setEnd(dateFilter.end)
+  }, [dateFilter])
 
   return (
     <div className={`${className} space-y-2`}>
@@ -37,13 +49,20 @@ export function DateFilter({ className }: { className?: string }) {
           />
         </div>
       </div>
-      <div>
+      <div className="flex gap-4">
         <button
           type="button"
-          className="px-2 py-1.5 bg-gray-500 border"
-          onClick={() => handleFilter()}
+          className="flex-2 px-2 py-1.5 bg-gray-500 border"
+          onClick={() => handleApplyFilter()}
         >
           Apply Filter
+        </button>
+        <button
+          type="button"
+          className="flex-1 px-2 py-1.5 bg-white text-black border"
+          onClick={() => handleClear()}
+        >
+          Clear
         </button>
       </div>
     </div>

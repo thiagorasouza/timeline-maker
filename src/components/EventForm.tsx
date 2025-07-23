@@ -1,6 +1,5 @@
 import { faker } from "@faker-js/faker"
 import { useEffect, useState } from "react"
-import { v4 as uuidv4 } from "uuid"
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import {
   addEvent,
@@ -34,10 +33,9 @@ export function EventForm({
 
       dispatch(updateEvent(eventData))
     } else {
-      const eventData = {
-        id: uuidv4(),
-        ...Object.fromEntries(formData.entries()),
-      } as unknown as Event
+      const eventData = Object.fromEntries(
+        formData.entries(),
+      ) as unknown as Event
 
       dispatch(addEvent(eventData))
     }
