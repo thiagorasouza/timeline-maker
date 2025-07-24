@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { getFutureDateString, getPastDateString } from "../../utils/helpers"
 import { RootState } from "../../app/store"
 import { v4 as uuidv4 } from "uuid"
+import { createAppAsyncThunk } from "../../app/thunks"
 
 export interface Event {
   id: string
@@ -20,27 +21,49 @@ const initialDateFilter: DateFilter = {
   end: getFutureDateString(30),
 }
 
-const initialEvents: Event[] = [
-  {
-    id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    title: "Lançamento da Nova Linha de Produtos 'Aurora'",
-    description:
-      "Apresentação oficial da coleção 'Aurora', focada em sustentabilidade e design inovador.",
-    date: "2025-08-15",
-  },
-  {
-    id: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    title: "Reunião Semanal de Planejamento de Sprint",
-    description:
-      "Discussão do progresso do sprint atual, planejamento das próximas tarefas e revisão de impedimentos.",
-    date: "2025-07-22",
-  },
-]
+// const initialEvents: Event[] = [
+//   {
+//     id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+//     title: "Lançamento da Nova Linha de Produtos 'Aurora'",
+//     description:
+//       "Apresentação oficial da coleção 'Aurora', focada em sustentabilidade e design inovador.",
+//     date: "2025-08-15",
+//   },
+//   {
+//     id: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+//     title: "Reunião Semanal de Planejamento de Sprint",
+//     description:
+//       "Discussão do progresso do sprint atual, planejamento das próximas tarefas e revisão de impedimentos.",
+//     date: "2025-07-22",
+//   },
+// ]
 
-const initialState: { dateFilter: DateFilter; events: Event[] } = {
+const initialState: {
+  dateFilter: DateFilter
+  events: Event[]
+  status: "idle" | "pending" | "fulfilled" | "failed"
+} = {
   dateFilter: initialDateFilter,
-  events: initialEvents,
+  // events: initialEvents,
+  events: [],
+  status: "idle",
 }
+
+export const fetchEvents = createAppAsyncThunk(
+  "events/fetchEvents",
+  async () => {
+    const events = localStorage.getItem("events")
+    return events ? JSON.parse(events) : []
+  },
+  {
+    condition: (_, api) => {
+      const status = selectEventStatus(api.getState())
+      if (status !== "idle") {
+        return false
+      }
+    },
+  },
+)
 
 export const eventsSlice = createSlice({
   name: "events",
@@ -71,6 +94,17 @@ export const eventsSlice = createSlice({
     clearDateFilter: state => {
       state.dateFilter = initialDateFilter
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(fetchEvents.fulfilled, (state, action) => {
+      state.events = action.payload
+    })
+    builder.addCase(fetchEvents.pending, state => {
+      state.status = "pending"
+    })
+    builder.addCase(fetchEvents.rejected, state => {
+      state.status = "failed"
+    })
   },
 })
 
@@ -112,4 +146,7 @@ export const selectFilteredSortedEvents = (state: RootState) => {
 
 export const selectEventById = (state: RootState, id?: string) =>
   id ? state.events.events.find(event => event.id === id) : undefined
+
 export const selectDateFilter = (state: RootState) => state.events.dateFilter
+
+export const selectEventStatus = (state: RootState) => state.events.status

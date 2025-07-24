@@ -1,10 +1,17 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { EventForm } from "./components/EventForm"
 import { EventList } from "./components/EventList"
 import { Timeline } from "./components/Timeline"
+import { useAppDispatch } from "./app/hooks"
+import { fetchEvents } from "./features/events/eventsSlice"
 
 export function App() {
   const [eventId, setEventId] = useState<string>()
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(fetchEvents())
+  }, [])
 
   return (
     <main className="max-w-7xl border p-4 m-4 rounder-md mx-auto">
