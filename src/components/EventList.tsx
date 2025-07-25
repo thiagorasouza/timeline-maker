@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import {
   removeEvent,
-  selectFilteredSortedEvents,
+  selectFilteredEvents,
 } from "../features/events/eventsSlice"
 import { formatDateForDisplay } from "../utils/helpers"
 import { DateFilter } from "./DateFilter"
@@ -13,7 +13,8 @@ export function EventList({
   className?: string
   onUpdateClick: (id: string) => void
 }) {
-  const events = useAppSelector(selectFilteredSortedEvents)
+  const events = useAppSelector(selectFilteredEvents)
+
   const dispatch = useAppDispatch()
 
   async function handleRemove(id: string) {
@@ -47,28 +48,31 @@ export function EventList({
           </tr>
         </thead>
         <tbody>
-          {events.map(event => (
-            <tr key={event.id}>
-              <td className="p-2 border">{event.title}</td>
-              <td className="p-2 border">{formatDateForDisplay(event.date)}</td>
-              <td className="p-2 border space-y-2">
-                <button
-                  type="button"
-                  className="px-2 py-1 bg-red-700 text-white"
-                  onClick={() => handleRemove(event.id)}
-                >
-                  Remove
-                </button>
-                <button
-                  type="button"
-                  className="px-2 py-1"
-                  onClick={() => onUpdateClick(event.id)}
-                >
-                  Update
-                </button>
-              </td>
-            </tr>
-          ))}
+          {Array.isArray(events) &&
+            events.map(event => (
+              <tr key={event.id}>
+                <td className="p-2 border">{event.title}</td>
+                <td className="p-2 border">
+                  {formatDateForDisplay(event.date)}
+                </td>
+                <td className="p-2 border space-y-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 bg-red-700 text-white"
+                    onClick={() => handleRemove(event.id)}
+                  >
+                    Remove
+                  </button>
+                  <button
+                    type="button"
+                    className="px-2 py-1"
+                    onClick={() => onUpdateClick(event.id)}
+                  >
+                    Update
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

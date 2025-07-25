@@ -25,7 +25,7 @@ export function EventForm({
     "idle" | "pending" | "fulfilled" | "failed"
   >("idle")
   const dispatch = useAppDispatch()
-  const event = useAppSelector(state => selectEventById(state, eventId))
+  const event = useAppSelector(state => selectEventById(state, eventId || ""))
 
   async function handleSubmit(formData: FormData) {
     if (saveStatus === "pending") return
@@ -63,7 +63,7 @@ export function EventForm({
   }
 
   useEffect(() => {
-    if (event) {
+    if (eventId && event) {
       setTitle(event.title)
       setDescription(event.description)
       setDate(event.date)

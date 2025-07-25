@@ -1,4 +1,10 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import {
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  EntityState,
+  PayloadAction,
+} from "@reduxjs/toolkit"
 import { getFutureDateString, getPastDateString } from "../../utils/helpers"
 import { RootState } from "../../app/store"
 import { v4 as uuidv4 } from "uuid"
@@ -16,21 +22,24 @@ export interface DateFilter {
   end: string
 }
 
+interface EventsState extends EntityState<Event, string> {
+  status: "idle" | "pending" | "fulfilled" | "failed"
+  dateFilter: DateFilter
+}
+
+const eventsAdapter = createEntityAdapter<Event>({
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
+})
+
 const initialDateFilter: DateFilter = {
   start: getPastDateString(30),
   end: getFutureDateString(30),
 }
 
-const initialState: {
-  dateFilter: DateFilter
-  events: Event[]
-  status: "idle" | "pending" | "fulfilled" | "failed"
-} = {
-  dateFilter: initialDateFilter,
-  // events: initialEvents,
-  events: [],
+const initialState: EventsState = eventsAdapter.getInitialState({
   status: "idle",
-}
+  dateFilter: initialDateFilter,
+})
 
 export const fetchEvents = createAppAsyncThunk(
   "events/fetchEvents",
@@ -66,24 +75,14 @@ export const eventsSlice = createSlice({
   name: "events",
   initialState,
   reducers: {
-    addEvent: {
-      prepare: (eventData: Omit<Event, "id">) => ({
-        payload: { id: uuidv4(), ...eventData },
-      }),
-      reducer: (state, action: PayloadAction<Event>) => {
-        state.events.push(action.payload)
-      },
-    },
     removeEvent: (state, action: PayloadAction<string>) => {
-      state.events = state.events.filter(event => event.id !== action.payload)
+      eventsAdapter.removeOne(state, action.payload)
     },
     updateEvent: (state, action: PayloadAction<Event>) => {
-      const index = state.events.findIndex(
-        event => event.id === action.payload.id,
-      )
-      if (index !== -1) {
-        state.events[index] = action.payload
-      }
+      eventsAdapter.updateOne(state, {
+        id: action.payload.id,
+        changes: action.payload,
+      })
     },
     setDateFilter: (state, action: PayloadAction<DateFilter>) => {
       state.dateFilter = action.payload
@@ -94,7 +93,7 @@ export const eventsSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(fetchEvents.fulfilled, (state, action) => {
-      state.events = action.payload
+      eventsAdapter.setAll(state, action.payload)
     })
     builder.addCase(fetchEvents.pending, state => {
       state.status = "pending"
@@ -103,43 +102,33 @@ export const eventsSlice = createSlice({
       state.status = "failed"
     })
     builder.addCase(saveEvent.fulfilled, (state, action) => {
-      state.events.push(action.payload)
+      eventsAdapter.addOne(state, action.payload)
     })
   },
 })
 
 export const eventsReducer = eventsSlice.reducer
 
-export const {
-  addEvent,
-  removeEvent,
-  updateEvent,
-  setDateFilter,
-  clearDateFilter,
-} = eventsSlice.actions
+export const { removeEvent, updateEvent, setDateFilter, clearDateFilter } =
+  eventsSlice.actions
 
-export const selectAllEvents = (state: RootState) => state.events.events
+export const { selectAll: selectAllEvents, selectById: selectEventById } =
+  eventsAdapter.getSelectors((state: RootState) => state.events)
 
 export const selectDateFilter = (state: RootState) => state.events.dateFilter
 
 export const selectEventStatus = (state: RootState) => state.events.status
 
-export const selectEventById = (state: RootState, id?: string) =>
-  id ? state.events.events.find(event => event.id === id) : undefined
-
-export const selectFilteredSortedEvents = createSelector(
+export const selectFilteredEvents = createSelector(
   [selectDateFilter, selectAllEvents],
-  (dateFilter, allEvents) => {
-    let selectedEvents = allEvents
+  (dateFilter, events) => {
     const { start, end } = dateFilter
     if (start && end) {
-      selectedEvents = allEvents.filter(event => {
+      return events.filter(event => {
         const date = new Date(event.date)
         return date >= new Date(start) && date <= new Date(end)
       })
     }
-    return selectedEvents.sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime()
-    })
+    return events
   },
 )

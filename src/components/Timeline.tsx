@@ -1,9 +1,9 @@
 import { useAppSelector } from "../app/hooks"
-import { selectFilteredSortedEvents } from "../features/events/eventsSlice"
+import { selectFilteredEvents } from "../features/events/eventsSlice"
 import { formatDateForDisplay } from "../utils/helpers"
 
 export function Timeline({ className }: { className: string }) {
-  const events = useAppSelector(selectFilteredSortedEvents)
+  const events = useAppSelector(selectFilteredEvents)
 
   return (
     <div className={`relative ${className}`}>
