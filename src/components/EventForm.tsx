@@ -2,8 +2,8 @@ import { faker } from "@faker-js/faker"
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import {
-  addEvent,
   Event,
+  saveEvent,
   selectEventById,
   updateEvent,
 } from "../features/events/eventsSlice"
@@ -21,23 +21,38 @@ export function EventForm({
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [date, setDate] = useState(getPresenteDateString)
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "pending" | "fulfilled" | "failed"
+  >("idle")
   const dispatch = useAppDispatch()
   const event = useAppSelector(state => selectEventById(state, eventId))
 
   async function handleSubmit(formData: FormData) {
-    if (eventId) {
-      const eventData = {
-        id: eventId,
-        ...Object.fromEntries(formData.entries()),
-      } as unknown as Event
+    if (saveStatus === "pending") return
 
-      dispatch(updateEvent(eventData))
-    } else {
-      const eventData = Object.fromEntries(
-        formData.entries(),
-      ) as unknown as Event
+    setSaveStatus("pending")
+    try {
+      if (eventId) {
+        // Update
+        const eventData = {
+          id: eventId,
+          ...Object.fromEntries(formData.entries()),
+        } as unknown as Event
 
-      dispatch(addEvent(eventData))
+        dispatch(updateEvent(eventData))
+      } else {
+        // Add
+        const eventData = Object.fromEntries(
+          formData.entries(),
+        ) as unknown as Omit<Event, "id">
+
+        await dispatch(saveEvent(eventData)).unwrap()
+      }
+      setSaveStatus("fulfilled")
+    } catch (error) {
+      setSaveStatus("failed")
+    } finally {
+      setTimeout(() => setSaveStatus("idle"), 3000)
     }
   }
 
@@ -65,6 +80,14 @@ export function EventForm({
       id="add-event"
       className={`flex flex-col gap-4 ${className}`}
     >
+      {saveStatus !== "idle" && (
+        <div>
+          {saveStatus === "fulfilled" && <p>Event saved successfully!</p>}
+          {saveStatus === "failed" && (
+            <p>There was an error while saving your event.</p>
+          )}
+        </div>
+      )}
       <div>
         <label htmlFor="title">Title</label>
         <input
