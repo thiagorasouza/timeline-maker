@@ -71,18 +71,39 @@ export const saveEvent = createAppAsyncThunk(
   },
 )
 
+export const deleteEvent = createAppAsyncThunk(
+  "events/deleteEvent",
+  async (id: string) => {
+    const eventsString = localStorage.getItem("events")
+    const events: Event[] = eventsString ? JSON.parse(eventsString) : []
+    const eventsAfterRemoval = events.filter(event => event.id !== id)
+    localStorage.setItem("events", JSON.stringify(eventsAfterRemoval))
+    return id
+  },
+)
+
+export const updateEvent = createAppAsyncThunk(
+  "events/updateEvent",
+  async (userEvent: Event) => {
+    const eventsString = localStorage.getItem("events")
+    const events: Event[] = eventsString ? JSON.parse(eventsString) : []
+    const storedEvent = events.find(event => event.id === userEvent.id)
+    if (storedEvent) {
+      Object.assign(storedEvent, userEvent)
+      localStorage.setItem("events", JSON.stringify(events))
+      return userEvent
+    } else {
+      throw new Error("Event not found.")
+    }
+  },
+)
+
 export const eventsSlice = createSlice({
   name: "events",
   initialState,
   reducers: {
     removeEvent: (state, action: PayloadAction<string>) => {
       eventsAdapter.removeOne(state, action.payload)
-    },
-    updateEvent: (state, action: PayloadAction<Event>) => {
-      eventsAdapter.updateOne(state, {
-        id: action.payload.id,
-        changes: action.payload,
-      })
     },
     setDateFilter: (state, action: PayloadAction<DateFilter>) => {
       state.dateFilter = action.payload
@@ -104,12 +125,21 @@ export const eventsSlice = createSlice({
     builder.addCase(saveEvent.fulfilled, (state, action) => {
       eventsAdapter.addOne(state, action.payload)
     })
+    builder.addCase(deleteEvent.fulfilled, (state, action) => {
+      eventsAdapter.removeOne(state, action.payload)
+    })
+    builder.addCase(updateEvent.fulfilled, (state, action) => {
+      eventsAdapter.updateOne(state, {
+        id: action.payload.id,
+        changes: action.payload,
+      })
+    })
   },
 })
 
 export const eventsReducer = eventsSlice.reducer
 
-export const { removeEvent, updateEvent, setDateFilter, clearDateFilter } =
+export const { removeEvent, setDateFilter, clearDateFilter } =
   eventsSlice.actions
 
 export const { selectAll: selectAllEvents, selectById: selectEventById } =

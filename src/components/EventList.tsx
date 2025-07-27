@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import {
-  removeEvent,
+  deleteEvent,
   selectFilteredEvents,
 } from "../features/events/eventsSlice"
 import { formatDateForDisplay } from "../utils/helpers"
@@ -18,7 +18,7 @@ export function EventList({
   const dispatch = useAppDispatch()
 
   async function handleRemove(id: string) {
-    dispatch(removeEvent(id))
+    dispatch(deleteEvent(id))
   }
 
   if (events.length === 0) {
