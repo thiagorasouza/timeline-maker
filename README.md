@@ -1,27 +1,55 @@
-# vite-template-redux
+# Timeline Maker
 
-Uses [Vite](https://vitejs.dev/), [Vitest](https://vitest.dev/), and [React Testing Library](https://github.com/testing-library/react-testing-library) to create a modern [React](https://react.dev/) app compatible with [Create React App](https://create-react-app.dev/)
+## 🚀 Overview
 
-```sh
-npx tiged reduxjs/redux-templates/packages/vite-template-redux my-app
-```
+A dynamic web app that lets users create timelines with ease. You can **add, edit, and remove events**, and also **filter them by date range**.
 
-## Goals
+### Technologies Used
 
-- Easy migration from Create React App or Vite
-- As beginner friendly as Create React App
-- Optimized performance compared to Create React App
-- Customizable without ejecting
+This application highlights my ability to work with:
 
-## Scripts
+- **React:**
+- **Redux, Redux Toolkit, Redux Thunks:**
+- **TypeScript:**
+- **Vite:**
 
-- `dev`/`start` - start dev server and open browser
-- `build` - build for production
-- `preview` - locally preview production build
-- `test` - launch test runner
+## ✨ Features
 
-## Inspiration
+- **Event Management:** Add, edit, and remove events.
+- **Date Filtering:** Custom date range.
+- **Chronological Display:** Order is always kept.
+- **Local Data Persistence:** Event data is saved and loaded from `localStorage`.
 
-- [Create React App](https://github.com/facebook/create-react-app/tree/main/packages/cra-template)
-- [Vite](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react)
-- [Vitest](https://github.com/vitest-dev/vitest/tree/main/examples/react-testing-lib)
+## 🚀 Run
+
+Follow these steps to set up and run the project locally:
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/en/)
+- [pnpm](https://pnpm.io/installation)
+
+### Steps
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/thiagorasouza/timeline-maker
+    cd timeline-maker
+    ```
+2.  **Install dependencies:**
+    ```bash
+    pnpm install
+    ```
+3.  **Start the development server:**
+    ```bash
+    pnpm dev
+    ```
+4.  Navigate to `http://localhost:5173`
+
+## 📸 Screenshots / Demo
+
+Todo.
+
+## 📄 Credits
+
+Timeline Maker is under development by 🚀 Thiago Souza (@thiagorasouza)
